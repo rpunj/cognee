@@ -29,9 +29,6 @@ RUN apt-get update && apt-get install -y \
 # Copy pyproject.toml and lockfile first for better caching
 COPY ./cognee-mcp/pyproject.toml ./cognee-mcp/uv.lock ./cognee-mcp/entrypoint.sh ./
 
-# Install the project's dependencies using the lockfile and settings
-RUN uv sync --frozen --no-install-project --no-dev --no-editable
-
 # Copy Alembic configuration
 COPY alembic.ini /app/alembic.ini
 COPY alembic/ /app/alembic
