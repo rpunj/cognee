@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy pyproject.toml and lockfile first for better caching
-COPY ./cognee-mcp/pyproject.toml ./cognee-mcp/uv.lock ./cognee-mcp/entrypoint.sh ./
+COPY ./cognee-mcp/pyproject.toml ./cognee-mcp/uv.lock ./cognee-mcp/entrypoint.sh /app
 
 # Copy Alembic configuration
 COPY alembic.ini /app/alembic.ini
@@ -36,15 +36,16 @@ COPY alembic/ /app/alembic
 # Then, add the rest of the project source code and install it
 # Installing separately from its dependencies allows optimal layer caching
 COPY ./cognee-mcp /app
+RUN cd /app
 RUN uv sync --frozen --no-dev --no-editable
 
 FROM python:3.12-slim-bookworm
 
+WORKDIR /app
+
 RUN apt-get update && apt-get install -y \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
 
 COPY --from=uv /root/.local /root/.local
 COPY --from=uv /app /app
